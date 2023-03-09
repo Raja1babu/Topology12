@@ -1,0 +1,250 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1>Employee Graph</h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1>Employee Graph</h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 700px;
+                 background-color: white;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 700px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "font": {"color": "red"}, "id": "Employee", "label": "Employee", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "98time", "label": "98time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "98Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "98Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "2mid", "label": "2id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "5mid", "label": "5id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "6mid", "label": "6id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "7mid", "label": "7id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "12mid", "label": "12id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "13mid", "label": "13id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "3fid", "label": "3id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "4fid", "label": "4id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "8fid", "label": "8id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "9fid", "label": "9id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "10fid", "label": "10id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "11fid", "label": "11id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "14fid", "label": "14id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "97time", "label": "97time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "97Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "97Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "15mid", "label": "15id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "16mid", "label": "16id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "17mid", "label": "17id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "18mid", "label": "18id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "19mid", "label": "19id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "22mid", "label": "22id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "20fid", "label": "20id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "21fid", "label": "21id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "23fid", "label": "23id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "24fid", "label": "24id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "25fid", "label": "25id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "96time", "label": "96time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "96Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "96Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "26mid", "label": "26id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "27mid", "label": "27id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "28mid", "label": "28id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "29mid", "label": "29id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "30mid", "label": "30id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "31mid", "label": "31id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "32mid", "label": "32id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "33mid", "label": "33id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "34mid", "label": "34id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "35mid", "label": "35id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "37mid", "label": "37id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "38mid", "label": "38id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "39mid", "label": "39id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "36fid", "label": "36id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "40fid", "label": "40id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "41fid", "label": "41id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "95time", "label": "95time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "95Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "95Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "42mid", "label": "42id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "43mid", "label": "43id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "44mid", "label": "44id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "45mid", "label": "45id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "46fid", "label": "46id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "47fid", "label": "47id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "94time", "label": "94time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "94Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "94Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "48mid", "label": "48id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "49mid", "label": "49id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "50mid", "label": "50id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "51mid", "label": "51id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "52mid", "label": "52id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "53mid", "label": "53id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "54mid", "label": "54id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "55mid", "label": "55id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "56mid", "label": "56id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "57mid", "label": "57id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "59mid", "label": "59id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "60mid", "label": "60id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "61mid", "label": "61id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "58fid", "label": "58id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "93time", "label": "93time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "93Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "93Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "62mid", "label": "62id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "63mid", "label": "63id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "64mid", "label": "64id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "65mid", "label": "65id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "66mid", "label": "66id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "67mid", "label": "67id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "68mid", "label": "68id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "69mid", "label": "69id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "70mid", "label": "70id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "71mid", "label": "71id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "72fid", "label": "72id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "73fid", "label": "73id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "74fid", "label": "74id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "75fid", "label": "75id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "76fid", "label": "76id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "77fid", "label": "77id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "78fid", "label": "78id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "79fid", "label": "79id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "80fid", "label": "80id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "81fid", "label": "81id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "82fid", "label": "82id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "83fid", "label": "83id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "84fid", "label": "84id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "92time", "label": "92time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "92Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "92Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "85mid", "label": "85id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "86mid", "label": "86id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "87mid", "label": "87id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "88mid", "label": "88id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "89mid", "label": "89id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "96mid", "label": "96id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "97mid", "label": "97id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "98mid", "label": "98id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "90fid", "label": "90id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "91fid", "label": "91id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "92fid", "label": "92id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "93fid", "label": "93id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "94fid", "label": "94id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "95fid", "label": "95id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "99fid", "label": "99id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "91time", "label": "91time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "91Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "91Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "100mid", "label": "100id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "101mid", "label": "101id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "102mid", "label": "102id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "103mid", "label": "103id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "104mid", "label": "104id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "105mid", "label": "105id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "106mid", "label": "106id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "109mid", "label": "109id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "110mid", "label": "110id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "111mid", "label": "111id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "112mid", "label": "112id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "107fid", "label": "107id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "108fid", "label": "108id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "90time", "label": "90time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "90Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "90Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "113mid", "label": "113id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "114mid", "label": "114id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "115mid", "label": "115id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "116mid", "label": "116id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "125mid", "label": "125id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "126mid", "label": "126id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "127mid", "label": "127id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "117fid", "label": "117id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "118fid", "label": "118id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "119fid", "label": "119id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "120fid", "label": "120id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "121fid", "label": "121id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "122fid", "label": "122id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "123fid", "label": "123id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "124fid", "label": "124id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "128fid", "label": "128id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "89time", "label": "89time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "89Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "89Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "129mid", "label": "129id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "130mid", "label": "130id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "131mid", "label": "131id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "132mid", "label": "132id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "133mid", "label": "133id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "134fid", "label": "134id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "135fid", "label": "135id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "88time", "label": "88time", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "88Male", "label": "Male", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "88Female", "label": "Female", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "136mid", "label": "136id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "137mid", "label": "137id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "138mid", "label": "138id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "145mid", "label": "145id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "139fid", "label": "139id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "140fid", "label": "140id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "141fid", "label": "141id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "142fid", "label": "142id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "143fid", "label": "143id", "shape": "circle"}, {"color": "#97c2fc", "font": {"color": "red"}, "id": "144fid", "label": "144id", "shape": "circle"}]);
+                  edges = new vis.DataSet([{"from": "98time", "to": "Employee"}, {"from": "98time", "to": "98Male"}, {"from": "98time", "to": "98Female"}, {"from": "2mid", "to": "98Male"}, {"from": "5mid", "to": "98Male"}, {"from": "6mid", "to": "98Male"}, {"from": "7mid", "to": "98Male"}, {"from": "12mid", "to": "98Male"}, {"from": "13mid", "to": "98Male"}, {"from": "3fid", "to": "98Female"}, {"from": "4fid", "to": "98Female"}, {"from": "8fid", "to": "98Female"}, {"from": "9fid", "to": "98Female"}, {"from": "10fid", "to": "98Female"}, {"from": "11fid", "to": "98Female"}, {"from": "14fid", "to": "98Female"}, {"from": "97time", "to": "Employee"}, {"from": "97time", "to": "97Male"}, {"from": "97time", "to": "97Female"}, {"from": "15mid", "to": "97Male"}, {"from": "16mid", "to": "97Male"}, {"from": "17mid", "to": "97Male"}, {"from": "18mid", "to": "97Male"}, {"from": "19mid", "to": "97Male"}, {"from": "22mid", "to": "97Male"}, {"from": "20fid", "to": "97Female"}, {"from": "21fid", "to": "97Female"}, {"from": "23fid", "to": "97Female"}, {"from": "24fid", "to": "97Female"}, {"from": "25fid", "to": "97Female"}, {"from": "96time", "to": "Employee"}, {"from": "96time", "to": "96Male"}, {"from": "96time", "to": "96Female"}, {"from": "26mid", "to": "96Male"}, {"from": "27mid", "to": "96Male"}, {"from": "28mid", "to": "96Male"}, {"from": "29mid", "to": "96Male"}, {"from": "30mid", "to": "96Male"}, {"from": "31mid", "to": "96Male"}, {"from": "32mid", "to": "96Male"}, {"from": "33mid", "to": "96Male"}, {"from": "34mid", "to": "96Male"}, {"from": "35mid", "to": "96Male"}, {"from": "37mid", "to": "96Male"}, {"from": "38mid", "to": "96Male"}, {"from": "39mid", "to": "96Male"}, {"from": "36fid", "to": "96Female"}, {"from": "40fid", "to": "96Female"}, {"from": "41fid", "to": "96Female"}, {"from": "95time", "to": "Employee"}, {"from": "95time", "to": "95Male"}, {"from": "95time", "to": "95Female"}, {"from": "42mid", "to": "95Male"}, {"from": "43mid", "to": "95Male"}, {"from": "44mid", "to": "95Male"}, {"from": "45mid", "to": "95Male"}, {"from": "46fid", "to": "95Female"}, {"from": "47fid", "to": "95Female"}, {"from": "94time", "to": "Employee"}, {"from": "94time", "to": "94Male"}, {"from": "94time", "to": "94Female"}, {"from": "48mid", "to": "94Male"}, {"from": "49mid", "to": "94Male"}, {"from": "50mid", "to": "94Male"}, {"from": "51mid", "to": "94Male"}, {"from": "52mid", "to": "94Male"}, {"from": "53mid", "to": "94Male"}, {"from": "54mid", "to": "94Male"}, {"from": "55mid", "to": "94Male"}, {"from": "56mid", "to": "94Male"}, {"from": "57mid", "to": "94Male"}, {"from": "59mid", "to": "94Male"}, {"from": "60mid", "to": "94Male"}, {"from": "61mid", "to": "94Male"}, {"from": "58fid", "to": "94Female"}, {"from": "93time", "to": "Employee"}, {"from": "93time", "to": "93Male"}, {"from": "93time", "to": "93Female"}, {"from": "62mid", "to": "93Male"}, {"from": "63mid", "to": "93Male"}, {"from": "64mid", "to": "93Male"}, {"from": "65mid", "to": "93Male"}, {"from": "66mid", "to": "93Male"}, {"from": "67mid", "to": "93Male"}, {"from": "68mid", "to": "93Male"}, {"from": "69mid", "to": "93Male"}, {"from": "70mid", "to": "93Male"}, {"from": "71mid", "to": "93Male"}, {"from": "72fid", "to": "93Female"}, {"from": "73fid", "to": "93Female"}, {"from": "74fid", "to": "93Female"}, {"from": "75fid", "to": "93Female"}, {"from": "76fid", "to": "93Female"}, {"from": "77fid", "to": "93Female"}, {"from": "78fid", "to": "93Female"}, {"from": "79fid", "to": "93Female"}, {"from": "80fid", "to": "93Female"}, {"from": "81fid", "to": "93Female"}, {"from": "82fid", "to": "93Female"}, {"from": "83fid", "to": "93Female"}, {"from": "84fid", "to": "93Female"}, {"from": "92time", "to": "Employee"}, {"from": "92time", "to": "92Male"}, {"from": "92time", "to": "92Female"}, {"from": "85mid", "to": "92Male"}, {"from": "86mid", "to": "92Male"}, {"from": "87mid", "to": "92Male"}, {"from": "88mid", "to": "92Male"}, {"from": "89mid", "to": "92Male"}, {"from": "96mid", "to": "92Male"}, {"from": "97mid", "to": "92Male"}, {"from": "98mid", "to": "92Male"}, {"from": "90fid", "to": "92Female"}, {"from": "91fid", "to": "92Female"}, {"from": "92fid", "to": "92Female"}, {"from": "93fid", "to": "92Female"}, {"from": "94fid", "to": "92Female"}, {"from": "95fid", "to": "92Female"}, {"from": "99fid", "to": "92Female"}, {"from": "91time", "to": "Employee"}, {"from": "91time", "to": "91Male"}, {"from": "91time", "to": "91Female"}, {"from": "100mid", "to": "91Male"}, {"from": "101mid", "to": "91Male"}, {"from": "102mid", "to": "91Male"}, {"from": "103mid", "to": "91Male"}, {"from": "104mid", "to": "91Male"}, {"from": "105mid", "to": "91Male"}, {"from": "106mid", "to": "91Male"}, {"from": "109mid", "to": "91Male"}, {"from": "110mid", "to": "91Male"}, {"from": "111mid", "to": "91Male"}, {"from": "112mid", "to": "91Male"}, {"from": "107fid", "to": "91Female"}, {"from": "108fid", "to": "91Female"}, {"from": "90time", "to": "Employee"}, {"from": "90time", "to": "90Male"}, {"from": "90time", "to": "90Female"}, {"from": "113mid", "to": "90Male"}, {"from": "114mid", "to": "90Male"}, {"from": "115mid", "to": "90Male"}, {"from": "116mid", "to": "90Male"}, {"from": "125mid", "to": "90Male"}, {"from": "126mid", "to": "90Male"}, {"from": "127mid", "to": "90Male"}, {"from": "117fid", "to": "90Female"}, {"from": "118fid", "to": "90Female"}, {"from": "119fid", "to": "90Female"}, {"from": "120fid", "to": "90Female"}, {"from": "121fid", "to": "90Female"}, {"from": "122fid", "to": "90Female"}, {"from": "123fid", "to": "90Female"}, {"from": "124fid", "to": "90Female"}, {"from": "128fid", "to": "90Female"}, {"from": "89time", "to": "Employee"}, {"from": "89time", "to": "89Male"}, {"from": "89time", "to": "89Female"}, {"from": "129mid", "to": "89Male"}, {"from": "130mid", "to": "89Male"}, {"from": "131mid", "to": "89Male"}, {"from": "132mid", "to": "89Male"}, {"from": "133mid", "to": "89Male"}, {"from": "134fid", "to": "89Female"}, {"from": "135fid", "to": "89Female"}, {"from": "88time", "to": "Employee"}, {"from": "88time", "to": "88Male"}, {"from": "88time", "to": "88Female"}, {"from": "136mid", "to": "88Male"}, {"from": "137mid", "to": "88Male"}, {"from": "138mid", "to": "88Male"}, {"from": "145mid", "to": "88Male"}, {"from": "139fid", "to": "88Female"}, {"from": "140fid", "to": "88Female"}, {"from": "141fid", "to": "88Female"}, {"from": "142fid", "to": "88Female"}, {"from": "143fid", "to": "88Female"}, {"from": "144fid", "to": "88Female"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
